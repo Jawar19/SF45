@@ -68,6 +68,9 @@ int main() {
     int32_t     baudRate    = 921600;
 	const int   FOV         = 50;	// measures in degrees on either side of 0
 
+    uint8_t     updateRate  = 5;
+    uint16_t    scanSpeed   = 15;
+
     uint32_t dist_info = 0;
 	dist_info |= BIT(0);  // First return raw
 	dist_info |= BIT(1);  // First return filter
@@ -107,6 +110,14 @@ int main() {
     std::cout << std::setw(15) << std::left << "HW Version: " << std::setw(10) << std::right << hardwareVersion << '\n';
     std::cout << std::setw(15) << std::left << "FW Version: " << std::setw(10) << std::right << firmwareVersionStr << '\n';
 
+    // setup of the lidar
+    if (!lwnxCmdWriteInt8(serial, 66, updateRate))
+    {
+        exitCommandFailure();
+    }
+    uint8_t readPSec;
+	if (!lwnxCmdReadUInt8(serial, 66, &readPSec)) { exitCommandFailure(); }
+    std::cout << "scan speed: " << int(readPSec) << " Micro second delay" << std::endl;
 
     return 0;
 }
