@@ -8,17 +8,11 @@ include(CTest)
 enable_testing()
 
 include_directories(
-        ${PROJECT_SOURCE_DIR}/include
-        ${PROJECT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_LIST_DIR}/include
+        ${CMAKE_CURRENT_LIST_DIR}/src
 )
-file(GLOB all_SRCS
-        "${PROJECT_SOURCE_DIR}/include/*.h"
-        "${PROJECT_SOURCE_DIR}/include/*.hpp"
-        "${PROJECT_SOURCE_DIR}/src/*.cpp"
-        "${PROJECT_SOURCE_DIR}/src/*.c"
-        )
 
-add_executable(sf45 main.cpp ${all_SRCS})
+add_executable(sf45 main.cpp ${all_SRCS} lwNx.cpp "win32/lwSerialPortWin32.cpp" "win32/platformWin32.cpp")
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
