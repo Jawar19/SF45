@@ -1,4 +1,5 @@
 #include <iomanip>
+#include <thread>
 
 #include "SF45.h"
 
@@ -16,6 +17,9 @@ SF45::SF45(const char* pPortName, const int32_t &baudRate) {
 
 SF45::~SF45(){
     if (this->serial) {
+
+        this->stopReadStream();
+
         serial->disconnect();
         delete serial;
     }
@@ -173,5 +177,32 @@ bool SF45::enableStream(bool enable) {
 }
 
 PointInfo_t SF45::pollLidar(){
+    lwResponsePacket response;
 
+    if (!lwnxRecvPacket(this->serial, 44, &response, 1000)) {
+        return;
+    }
+
+    return interpretResponse(response);
+}
+
+void SF45::readStreamWorker() {
+    std::cout << "Worker thread called" << std::endl;
+    while (isReadingStream) {
+        std::cout << "reading stream, in thread: " << std::this_thread::get_id << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+    std::cout << "Ending stream reader thread" << std::endl;
+}
+
+bool SF45::startReadStream() {
+    std::cout << "Starting worker thread" << std::endl;
+    this->streamReaderThread = std::thread(&SF45::readStreamWorker, this);
+}
+
+bool SF45::stopReadStream() {
+    if (this->streamReaderThread.joinable()) {
+        this->isReadingStream = false;
+        this->streamReaderThread.join();
+    }
 }

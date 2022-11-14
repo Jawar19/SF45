@@ -95,7 +95,7 @@ namespace LIDAR{
          * @param packet response from the serial connection, to be interpreted, must not be null
          * @return PointInfo_t struct containing the interpreted data of the response package
          */
-        PointInfo_t interpretResponse(lwResponsePacket &response);
+        static PointInfo_t interpretResponse(lwResponsePacket &response);
 
     public:
         SF45(const char *pPortName, const int32_t &baudRate);
@@ -212,6 +212,10 @@ namespace LIDAR{
          * @return PointInfo_t struct containing data of the given point 
          */
         PointInfo_t pollLidar();
+
+        void readStreamWorker();
+        bool startReadStream();
+        bool stopReadStream();
 
     };
 }
