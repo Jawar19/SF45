@@ -117,7 +117,14 @@ int main() {
     }
     uint8_t readPSec;
 	if (!lwnxCmdReadUInt8(serial, 66, &readPSec)) { exitCommandFailure(); }
-    std::cout << "scan speed: " << int(readPSec) << " Micro second delay" << std::endl;
+    std::cout << std::setw(15) << std::left << "Sample rate: " << int(readPSec) << " Micro second delay" << std::endl;
+
+    uint16_t ScanSpeed;
+	if (!lwnxCmdReadUInt16(serial, 85, &ScanSpeed)) { exitCommandFailure(); }
+    std::cout << std::setw(15) << std::left << "scan speed: " << int(ScanSpeed) << " speed" << std::endl;
+
+    printf("Stop scanning..");
+	if (!lwnxCmdWriteUInt8(serial, 96, 1)) { exitCommandFailure(); }
 
     return 0;
 }

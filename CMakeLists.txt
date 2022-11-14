@@ -12,7 +12,12 @@ include_directories(
         ${CMAKE_CURRENT_LIST_DIR}/src
 )
 
-add_executable(sf45 main.cpp ${all_SRCS} lwNx.cpp "win32/lwSerialPortWin32.cpp" "win32/platformWin32.cpp")
+add_executable(sf45 
+        main.cpp
+        src/lwNx.cpp 
+        "src/win32/lwSerialPortWin32.cpp" 
+        "src/win32/platformWin32.cpp"
+        )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
