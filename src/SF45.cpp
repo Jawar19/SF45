@@ -2,6 +2,8 @@
 
 #include "SF45.h"
 
+using namespace LIDAR;
+
 SF45::SF45(const char* pPortName, const int32_t &baudRate) {
     platformInit();
     serial = platformCreateSerialPort();
@@ -47,5 +49,70 @@ uint16_t SF45::getScanSpeed(){
 }
 
 bool SF45::setScanSpeed(const uint16_t scanSpeed){
-    return lwnxCmdWriteUInt16(this->serial, 85, scanSpeed);
+    if (scanSpeed >= 5 && scanSpeed <= 2000) {
+        return lwnxCmdWriteUInt16(this->serial, 85, scanSpeed);
+    }
+}
+
+uint8_t SF45::getSampleRate(){
+    uint8_t sampleRate = -1;
+    lwnxCmdReadUInt8(this->serial, 66, &sampleRate);
+    return sampleRate;
+}
+
+bool SF45::setSampleRate(const SampleRates sampleRate){
+    return lwnxCmdWriteUInt8(serial, 66, sampleRate);
+}
+
+
+float SF45::getLowAngle() {
+    float lowAngle = -1;
+    lwnxCmdReadFloat32(this->serial, 98, &lowAngle);
+    return lowAngle;
+}
+
+float SF45::getHighAngle() {
+    float highAngle = -1;
+    lwnxCmdReadFloat32(this->serial, 99, &highAngle);
+    return highAngle;
+}
+
+bool SF45::setLowAngle(const float angle) {
+    if (angle < -5 && angle > -170){
+	    return lwnxCmdWriteFloat32(this->serial, 98, angle);
+    }
+    return false;
+}
+
+bool SF45::setHighAngle(const float angle) {
+	if (angle < 170 && angle > 5){
+	    return lwnxCmdWriteFloat32(this->serial, 99, angle);
+    }
+    return false;
+}
+
+float SF45::getAngle() {
+    float angle = -1;
+    lwnxCmdReadFloat32(this->serial, 97, &angle);
+    return angle;
+}
+
+bool SF45::setAngle(const float angle) {
+    if (angle > -170 && angle < 170) {
+        return lwnxCmdWriteFloat32(this->serial, 97, angle);
+    }
+    return false;
+}
+
+float SF45::getFoV() {
+    float low = this->getLowAngle();
+    float high = this->getHighAngle();
+    return high-low;
+}
+
+bool SF45::setFoV(const float fov) {
+    if (fov >= 10 && fov <= 340) {
+        this->setHighAngle((fov/2));
+        this->setLowAngle((fov/2)*-1);
+    }
 }
