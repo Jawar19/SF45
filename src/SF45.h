@@ -78,13 +78,9 @@ namespace LIDAR{
         lwSerialPort *serial = nullptr;
         UnitData unitData;
 
-        /**
-         * @brief Updates the unit data within this object to reflect the current state of the connected device.
-         * 
-         * @return true All read command executed successfully
-         * @return false any of the read commands failed during extraction
-         */
-        bool updateData();
+        std::atomic_bool isReadingStream = false;
+        std::thread streamReaderThread;
+
 
         static uint16_t readInt16(uint8_t* Buffer, uint32_t Offset);
         static uint32_t readInt32(uint8_t* Buffer, uint32_t Offset);
@@ -96,9 +92,23 @@ namespace LIDAR{
          * @return PointInfo_t struct containing the interpreted data of the response package
          */
         static PointInfo_t interpretResponse(lwResponsePacket &response);
+        
+        /**
+         * @brief Updates the unit data within this object to reflect the current state of the connected device.
+         * 
+         * @return true All read command executed successfully
+         * @return false any of the read commands failed during extraction
+         */
+        bool updateData();
+
+        void readStreamWorker();
 
     public:
         SF45(const char *pPortName, const int32_t &baudRate);
+
+
+        SF45(const SF45&) = delete;
+
         ~SF45();
 
         /**
@@ -213,7 +223,6 @@ namespace LIDAR{
          */
         PointInfo_t pollLidar();
 
-        void readStreamWorker();
         bool startReadStream();
         bool stopReadStream();
 
