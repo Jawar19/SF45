@@ -32,6 +32,36 @@ bool SF45::updateData(){
     return true;
 }
 
+uint16_t SF45::readInt16(uint8_t* Buffer, uint32_t Offset) {
+	uint16_t result;
+	result = (Buffer[Offset + 0] << 0) | (Buffer[Offset + 1] << 8);
+	return result;
+}
+
+
+uint32_t SF45::readInt32(uint8_t* Buffer, uint32_t Offset) {
+	uint32_t result;
+	result = (Buffer[Offset + 0] << 0) | (Buffer[Offset + 1] << 8) | (Buffer[Offset + 2] << 16) | (Buffer[Offset + 3] << 24);
+	return result;
+}
+
+PointInfo_t SF45::interpretResponse(lwResponsePacket &response) {
+    PointInfo_t point;
+    point.firstDistRaw = readInt16(response.data, 4);
+    point.firstDistFilter = readInt16(response.data, 6);
+    point.firstStrength = readInt16(response.data, 8);
+
+    point.lastDistRaw = readInt16(response.data, 10);
+    point.lastDistFilter = readInt16(response.data, 12);
+    point.lastStrength = readInt16(response.data, 14);
+
+    point.noise = readInt16(response.data, 16);
+    point.temp = readInt16(response.data, 18) / 100;
+    point.angle = (int16_t)(readInt16(response.data, 20)) / 100.;
+
+    return point;
+}
+
 void SF45::printUnitHeader(){
     std::cout << "SF45 platform" << std::endl;
     std::cout << std::setw(15) << std::left << "Model: " << std::setw(10) << std::right << this->unitData.modelName << '\n';
@@ -115,4 +145,33 @@ bool SF45::setFoV(const float fov) {
         this->setHighAngle((fov/2));
         this->setLowAngle((fov/2)*-1);
     }
+}
+
+uint32_t SF45::getPackageConfig() {
+    uint32_t config = -1;
+    lwnxCmdReadUInt32(this->serial, 27, &config);
+    return config;
+}
+
+bool SF45::setPackageConfig(uint32_t config) {
+    if (config > 0x1FF) {
+        return false;
+    }
+    return lwnxCmdWriteUInt32(this->serial, 27, config);
+}
+
+bool SF45::enableScanning(bool enable) {
+    lwnxCmdWriteUInt8(this->serial, 96, uint8_t(enable));
+}
+
+bool SF45::enableStream(bool enable) {
+    uint32_t setValue = 0;
+    if (enable) {
+        setValue = 5;
+    }
+    return lwnxCmdWriteUInt32(this->serial, 30, setValue);
+}
+
+PointInfo_t SF45::pollLidar(){
+
 }
