@@ -51,13 +51,30 @@ public:
     ~SF45();
 
     /**
+     * @brief Print a header text of the unit, describing the current HW/FW versions and serial numbers 
+     * 
+     */
+    void printUnitHeader();
+
+    /**
      * @brief Get the Scan Speed of the LiDAR.
      * polls the SF45 to get the current scan speed, return -1 if read from sensor fails.
      * 
      * @return uint16_t unsigned integer value describing the delay between each scan position. A higher value will cause the scan to take longer.
      */
     uint16_t getScanSpeed();
-    bool setScanSpeed();
+    
+    /**
+     * @brief Set the Scan Speed of the LiDAR.
+     * Send package to the LiDAR to set the scanSpeed
+     * 
+     * @param scanSpeed The delay between each scan position. A higher value will cause the scan to take longer.
+     * @return true If the write were successful
+     * @return false if the write were not successful
+     */
+    bool setScanSpeed(const uint16_t scanSpeed);
+
+
 };
 
 #endif /*SF45_h*/

@@ -1,3 +1,5 @@
+#include <iomanip>
+
 #include "SF45.h"
 
 SF45::SF45(const char* pPortName, const int32_t &baudRate) {
@@ -26,6 +28,14 @@ bool SF45::updateData(){
     lwnxConvertFirmwareVersionToStr(this->unitData.firmwareVer, this->unitData.firmwareVersionStr);
 
     return true;
+}
+
+void SF45::printUnitHeader(){
+    std::cout << "SF45 platform" << std::endl;
+    std::cout << std::setw(15) << std::left << "Model: " << std::setw(10) << std::right << this->unitData.modelName << '\n';
+    std::cout << std::setw(15) << std::left << "Serial#: " << std::setw(10) << std::right << this->unitData.serialNumber << '\n';
+    std::cout << std::setw(15) << std::left << "HW Version: " << std::setw(10) << std::right << this->unitData.hardwareVer << '\n';
+    std::cout << std::setw(15) << std::left << "FW Version: " << std::setw(10) << std::right << this->unitData.firmwareVersionStr << '\n';
 }
 
 uint16_t SF45::getScanSpeed(){
