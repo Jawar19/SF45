@@ -17,6 +17,9 @@
 
 #include <algorithm>
 #include <list>
+#include <queue>
+#include <thread>
+#include <mutex>
 
 #include "common.h"
 #include "lwNx.h"
@@ -80,6 +83,8 @@ namespace LIDAR{
 
         std::atomic_bool isReadingStream = false;
         std::thread streamReaderThread;
+        std::deque<PointInfo_t> pointQueue;
+        std::mutex mtx;
 
 
         static uint16_t readInt16(uint8_t* Buffer, uint32_t Offset);

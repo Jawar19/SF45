@@ -1,5 +1,5 @@
 #include <iomanip>
-#include <thread>
+
 
 #include "SF45.h"
 
@@ -191,12 +191,21 @@ void SF45::readStreamWorker() {
     while (isReadingStream) {
         std::cout << "reading stream, in thread: " << std::this_thread::get_id << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        // TODO: do read-i read-i stuff here
+        {
+            std::scoped_lock lock(mtx);
+            // TODO: add to back of deque and check if size is less than some predefined value in order to manage 
+            // memory usage. 
+
+        } /* End of Lock */
     }
     std::cout << "Ending stream reader thread" << std::endl;
 }
 
 bool SF45::startReadStream() {
     std::cout << "Starting worker thread" << std::endl;
+    this->isReadingStream = true;
     this->streamReaderThread = std::thread(&SF45::readStreamWorker, this);
 }
 
